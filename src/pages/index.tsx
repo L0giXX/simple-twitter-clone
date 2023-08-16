@@ -2,9 +2,13 @@ import { signIn, signOut, useSession } from "next-auth/react";
 import Head from "next/head";
 import Link from "next/link";
 import { api } from "~/utils/api";
+import { useState } from "react";
 
 export default function Home() {
+  const [content, setContent] = useState("");
   const hello = api.example.hello.useQuery({ text: "from tRPC" });
+  const posts = api.posts.getAll.useQuery();
+  const { mutate } = api.posts.create.useMutation();
 
   return (
     <>
@@ -47,6 +51,27 @@ export default function Home() {
               {hello.data ? hello.data.greeting : "Loading tRPC query..."}
             </p>
             <AuthShowcase />
+          </div>
+          <div className="flex flex-col items-center gap-2">
+            <input
+              placeholder="Input"
+              type="text"
+              value={content}
+              onChange={(e) => setContent(e.target.value)}
+            />
+            <button
+              className="rounded-full bg-white/10 px-10 py-3 font-semibold text-white no-underline transition hover:bg-white/20"
+              onClick={() => mutate({ content: content })}
+            >
+              Submit
+            </button>
+            <div className="flex flex-col items-center gap-2">
+              <p className="text-2xl text-white">
+                {posts.data?.map((post) => (
+                  <div key={post.id}>{post.content}</div>
+                ))}
+              </p>
+            </div>
           </div>
         </div>
       </main>

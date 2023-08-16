@@ -50,3 +50,9 @@ model Example {
     name      String
     createdAt DateTime @default(now())
 }
+
+model Post {
+    id        String   @id @default(auto()) @map("_id") @db.ObjectId
+    content   String
+    createdAt DateTime @default(now())
+}
