@@ -10,7 +10,7 @@ export default function Home() {
   const [content, setContent] = useState("");
   const { mutate } = api.posts.create.useMutation();
   const posts = api.posts.getAll.useQuery().data;
-  const profileImage = api.user.getProfileImage.useQuery().data;
+  const profileImage = api.posts.getCurrentImage.useQuery().data;
   return (
     <>
       <Head>
@@ -21,28 +21,21 @@ export default function Home() {
       <main className="mx-auto flex min-h-screen w-full border-x md:max-w-2xl">
         <div className="flex w-full flex-col overflow-scroll">
           <div className="border-b">
-            {sessionData ? (
-              <div className="mb-4 flex">
-                <Image
-                  className="m-4 h-16 w-16 rounded-full"
-                  src={profileImage?.image ?? ""}
-                  alt="Profile Picture"
-                  width={50}
-                  height={50}
-                />
-                <textarea
-                  className="min-h-[120px] w-full resize-none bg-transparent p-4 outline-none"
-                  placeholder="Type a new Tweet"
-                  value={content}
-                  onChange={(e) => setContent(e.target.value)}
-                />
-              </div>
-            ) : (
-              <button
-                className="m-4 w-1/6 rounded-xl bg-blue-500 px-2 text-xl"
-                onClick={() => void signIn()}
-              ></button>
-            )}
+            <div className="mb-4 flex">
+              <Image
+                className="m-4 h-16 w-16 rounded-full"
+                src={profileImage?.image ?? ""}
+                alt="Profile Picture"
+                width={50}
+                height={50}
+              />
+              <textarea
+                className="min-h-[120px] w-full resize-none bg-transparent p-4 outline-none"
+                placeholder="Type a new Tweet"
+                value={content}
+                onChange={(e) => setContent(e.target.value)}
+              />
+            </div>
             <hr className="mx-4 border-gray-500" />
             <div className="flex justify-end">
               <button
@@ -54,37 +47,46 @@ export default function Home() {
               >
                 Post
               </button>
+              {sessionData ? (
+                <button
+                  className="m-4 w-1/6 rounded-xl bg-blue-500 px-2 text-xl"
+                  onClick={() => void signOut()}
+                >
+                  Sign out
+                </button>
+              ) : (
+                <button
+                  className="m-4 w-1/6 rounded-xl bg-blue-500 px-2 text-xl"
+                  onClick={() => void signIn()}
+                >
+                  Sign in
+                </button>
+              )}
             </div>
           </div>
           {posts?.map((post) => (
-            <div key={post.id} className="flex h-24 items-center border-b p-4">
+            <Link
+              key={post.id}
+              className="flex h-24 items-center border-b p-4"
+              href={`/tweet/${post.id}`}
+            >
               <div className="flex gap-4">
                 <Image
                   className="h-12 w-12 rounded-full"
-                  src={profileImage?.image ?? ""}
+                  src={post.profilePicture?.image ?? ""}
                   alt="Profile Picture"
                   width={50}
                   height={50}
                 />
-                {post.content}
+                <div className="flex flex-col">
+                  <span className="font-bold">{post.user?.userId}</span>
+                  <span>{post.content}</span>
+                </div>
               </div>
-            </div>
+            </Link>
           ))}
         </div>
       </main>
     </>
   );
 }
-
-// <div className="flex flex-col items-center justify-center gap-4">
-//   <p className="text-center text-2xl text-white">
-//     {sessionData && <span>Logged in as {sessionData.user?.name}</span>}
-//     {secretMessage && <span> - {secretMessage}</span>}
-//   </p>
-//   <button
-//     className="rounded-full bg-white/10 px-10 py-3 font-semibold text-white no-underline transition hover:bg-white/20"
-//     onClick={sessionData ? () => void signOut() : () => void signIn()}
-//   >
-//     {sessionData ? "Sign out" : "Sign in"}
-//   </button>
-// </div>
