@@ -45,12 +45,6 @@ model User {
     Post          Post[]
 }
 
-model Example {
-    id        String   @id @default(auto()) @map("_id") @db.ObjectId
-    name      String
-    createdAt DateTime @default(now())
-}
-
 model Post {
     id        String   @id @default(auto()) @map("_id") @db.ObjectId
     content   String
