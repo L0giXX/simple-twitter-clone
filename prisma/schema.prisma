@@ -42,7 +42,7 @@ model User {
     image         String?
     accounts      Account[]
     sessions      Session[]
-    password      String?
+    Post          Post[]
 }
 
 model Example {
@@ -55,4 +55,6 @@ model Post {
     id        String   @id @default(auto()) @map("_id") @db.ObjectId
     content   String
     createdAt DateTime @default(now())
+    author    User     @relation(fields: [authorId], references: [id])
+    authorId  String   @db.ObjectId
 }

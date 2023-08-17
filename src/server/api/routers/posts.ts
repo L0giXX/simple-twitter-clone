@@ -12,6 +12,7 @@ export const postRouter = createTRPCRouter({
       const post = ctx.prisma.post.create({
         data: {
           content: input.content,
+          author: { connect: { id: ctx.session!.user.id } },
         },
       });
       return post;
