@@ -9,30 +9,20 @@ import { prisma } from "~/server/db";
 
 const addUserDataToPosts = async (posts: Post[]) => {
   const userIds = posts.map((post) => post.authorId);
-  const users = await prisma.account.findMany({
-    where: {
-      userId: { in: userIds },
-    },
-    select: {
-      userId: true,
-      provider: true,
-      providerAccountId: true,
-    },
-  });
-  const profileImage = await prisma.user.findMany({
+  const users = await prisma.user.findMany({
     where: {
       id: { in: userIds },
     },
     select: {
       id: true,
+      username: true,
       image: true,
     },
   });
 
   return posts.map((post) => {
-    const user = users.find((u) => u.userId === post.authorId);
-    const profilePicture = profileImage.find((u) => u.id === post.authorId);
-    return { ...post, user, profilePicture };
+    const user = users.find((u) => u.id === post.authorId);
+    return { ...post, user };
   });
 };
 
