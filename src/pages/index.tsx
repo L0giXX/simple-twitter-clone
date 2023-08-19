@@ -1,16 +1,17 @@
 import { signIn, signOut, useSession } from "next-auth/react";
+import { type Session } from "next-auth";
 import Head from "next/head";
 import Link from "next/link";
 import { api } from "~/utils/api";
 import { useState } from "react";
 import Image from "next/image";
+import GuestImage from "../../public/guest-image.jpg";
 
 export default function Home() {
   const { data: sessionData } = useSession();
   const [content, setContent] = useState("");
   const { mutate } = api.posts.create.useMutation();
   const posts = api.posts.getAll.useQuery().data;
-  const profileImage = api.posts.getCurrentImage.useQuery().data;
   return (
     <>
       <Head>
@@ -22,19 +23,21 @@ export default function Home() {
         <div className="flex w-full flex-col overflow-x-hidden overflow-y-scroll">
           <div className="border-b">
             <div className="mb-4 flex">
-              <Image
-                className="m-4 h-16 w-16 rounded-full"
-                src={profileImage?.image ?? ""}
-                alt="Profile Picture"
-                width={50}
-                height={50}
-              />
-              <textarea
-                className="min-h-[120px] w-full resize-none bg-transparent p-4 outline-none"
-                placeholder="Type a new Tweet"
-                value={content}
-                onChange={(e) => setContent(e.target.value)}
-              />
+              <Authorized sessionData={sessionData} />
+              {sessionData ? (
+                <textarea
+                  className="min-h-[120px] w-full resize-none bg-transparent p-4 outline-none"
+                  placeholder="Type a new Tweet"
+                  value={content}
+                  onChange={(e) => setContent(e.target.value)}
+                />
+              ) : (
+                <textarea
+                  className="min-h-[120px] w-full resize-none bg-transparent p-4 outline-none"
+                  placeholder="Sign in to post"
+                  disabled
+                />
+              )}
             </div>
             <hr className="mx-4 border-gray-500" />
             <div className="flex justify-end">
@@ -90,5 +93,29 @@ export default function Home() {
         </div>
       </main>
     </>
+  );
+}
+
+function Authorized({ sessionData }: { sessionData: Session | null }) {
+  if (sessionData) {
+    const profileImage = api.posts.getCurrentImage.useQuery().data;
+    return (
+      <Image
+        className="m-4 h-16 w-16 rounded-full"
+        src={profileImage?.image ?? GuestImage}
+        alt="Profile Picture"
+        width={50}
+        height={50}
+      />
+    );
+  }
+  return (
+    <Image
+      className="m-4 h-16 w-16 rounded-full"
+      src={GuestImage}
+      alt="Profile Picture"
+      width={50}
+      height={50}
+    />
   );
 }

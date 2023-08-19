@@ -29,7 +29,7 @@ const addUserDataToPosts = async (posts: Post[]) => {
 export const postRouter = createTRPCRouter({
   create: protectedProcedure
     .input(z.object({ content: z.string() }))
-    .mutation(({ input, ctx }) => {
+    .mutation(async ({ input, ctx }) => {
       const post = ctx.prisma.post.create({
         data: {
           content: input.content,
@@ -50,6 +50,9 @@ export const postRouter = createTRPCRouter({
       where: { id: ctx.session!.user.id },
       select: { image: true },
     });
+    if (!image) {
+      return null;
+    }
     return image;
   }),
 });
