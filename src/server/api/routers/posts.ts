@@ -6,6 +6,7 @@ import {
 } from "~/server/api/trpc";
 import type { Post } from "@prisma/client";
 import { prisma } from "~/server/db";
+import { TRPCError } from "@trpc/server";
 
 const addUserDataToPosts = async (posts: Post[]) => {
   const userIds = posts.map((post) => post.authorId);
@@ -45,13 +46,26 @@ export const postRouter = createTRPCRouter({
     });
     return addUserDataToPosts(posts);
   }),
+
+  getById: publicProcedure
+    .input(z.object({ id: z.string() }))
+    .query(async ({ input, ctx }) => {
+      const post = await ctx.prisma.post.findUnique({
+        where: { id: input.id },
+      });
+      if (!post) {
+        throw new TRPCError({ code: "NOT_FOUND", message: "Post not found" });
+      }
+      return (await addUserDataToPosts([post]))[0];
+    }),
+
   getCurrentImage: protectedProcedure.query(async ({ ctx }) => {
     const image = await ctx.prisma.user.findUnique({
       where: { id: ctx.session!.user.id },
       select: { image: true },
     });
     if (!image) {
-      return null;
+      throw new TRPCError({ code: "NOT_FOUND", message: "Image not found" });
     }
     return image;
   }),
