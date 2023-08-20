@@ -28,10 +28,10 @@ const addUserDataToPosts = async (posts: Post[]) => {
 };
 
 export const postRouter = createTRPCRouter({
-  create: protectedProcedure
+  createPost: protectedProcedure
     .input(z.object({ content: z.string() }))
     .mutation(async ({ input, ctx }) => {
-      const post = ctx.prisma.post.create({
+      const post = await ctx.prisma.post.create({
         data: {
           content: input.content,
           author: { connect: { id: ctx.session!.user.id } },
@@ -40,7 +40,7 @@ export const postRouter = createTRPCRouter({
       return post;
     }),
 
-  getAll: publicProcedure.query(async ({ ctx }) => {
+  getAllPosts: publicProcedure.query(async ({ ctx }) => {
     const posts = await ctx.prisma.post.findMany({
       orderBy: { createdAt: "desc" },
     });
@@ -69,4 +69,33 @@ export const postRouter = createTRPCRouter({
     }
     return image;
   }),
+
+  createComment: protectedProcedure
+    .input(z.object({ content: z.string(), postId: z.string() }))
+    .mutation(async ({ input, ctx }) => {
+      const comment = await ctx.prisma.comment.create({
+        data: {
+          content: input.content,
+          post: { connect: { id: input.postId } },
+          author: { connect: { id: ctx.session!.user.id } },
+        },
+      });
+      return comment;
+    }),
+
+  getComments: publicProcedure
+    .input(z.object({ postId: z.string() }))
+    .query(async ({ input, ctx }) => {
+      const comments = await ctx.prisma.comment.findMany({
+        where: { postId: input.postId },
+        orderBy: { createdAt: "desc" },
+      });
+      if (!comments) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Comments not found",
+        });
+      }
+      return comments;
+    }),
 });

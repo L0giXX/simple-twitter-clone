@@ -44,12 +44,24 @@ model User {
     accounts      Account[]
     sessions      Session[]
     Post          Post[]
+    Comment       Comment[]
 }
 
 model Post {
+    id        String    @id @default(auto()) @map("_id") @db.ObjectId
+    content   String
+    createdAt DateTime  @default(now())
+    author    User      @relation(fields: [authorId], references: [id])
+    authorId  String    @db.ObjectId
+    Comments  Comment[]
+}
+
+model Comment {
     id        String   @id @default(auto()) @map("_id") @db.ObjectId
     content   String
     createdAt DateTime @default(now())
     author    User     @relation(fields: [authorId], references: [id])
     authorId  String   @db.ObjectId
+    post      Post     @relation(fields: [postId], references: [id])
+    postId    String   @db.ObjectId
 }

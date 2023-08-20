@@ -10,8 +10,8 @@ import GuestImage from "../../public/guest-image.jpg";
 export default function Home() {
   const { data: sessionData } = useSession();
   const [content, setContent] = useState("");
-  const { mutate } = api.posts.create.useMutation();
-  const posts = api.posts.getAll.useQuery().data;
+  const { mutate } = api.posts.createPost.useMutation();
+  const posts = api.posts.getAllPosts.useQuery().data;
   return (
     <>
       <Head>
@@ -37,6 +37,7 @@ export default function Home() {
                 />
               )}
             </div>
+            <hr className="mx-4 border-gray-500" />
             <div className="flex justify-end">
               <button
                 className="m-4 w-1/6 rounded-xl bg-blue-500 px-2 text-xl"
@@ -79,7 +80,7 @@ export default function Home() {
                   height={50}
                 />
                 <div className="flex flex-col">
-                  <span className="font-bold">{post.user?.username}</span>
+                  <span className="font-bold">@{post.user?.username}</span>
                   <div className="max-h-36 overflow-y-hidden break-all">
                     {post.content}
                   </div>
