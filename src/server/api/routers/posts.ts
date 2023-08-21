@@ -4,7 +4,7 @@ import {
   publicProcedure,
   protectedProcedure,
 } from "~/server/api/trpc";
-import type { Post } from "@prisma/client";
+import type { Post, Comment } from "@prisma/client";
 import { prisma } from "~/server/db";
 import { TRPCError } from "@trpc/server";
 
@@ -24,6 +24,25 @@ const addUserDataToPosts = async (posts: Post[]) => {
   return posts.map((post) => {
     const user = users.find((u) => u.id === post.authorId);
     return { ...post, user };
+  });
+};
+
+const addUserDataToComments = async (comments: Comment[]) => {
+  const userIds = comments.map((comment) => comment.authorId);
+  const users = await prisma.user.findMany({
+    where: {
+      id: { in: userIds },
+    },
+    select: {
+      id: true,
+      username: true,
+      image: true,
+    },
+  });
+
+  return comments.map((comment) => {
+    const user = users.find((u) => u.id === comment.authorId);
+    return { ...comment, user };
   });
 };
 
@@ -96,6 +115,6 @@ export const postRouter = createTRPCRouter({
           message: "Comments not found",
         });
       }
-      return comments;
+      return await addUserDataToComments(comments);
     }),
 });

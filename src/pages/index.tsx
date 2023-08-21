@@ -72,13 +72,18 @@ export default function Home() {
               href={`/${post.user?.username}/status/${post.id}`}
             >
               <div className="flex gap-4">
-                <Image
-                  className="h-12 w-12 rounded-full"
-                  src={post.user?.image ?? ""}
-                  alt="Profile Picture"
-                  width={50}
-                  height={50}
-                />
+                <div className="flex flex-col gap-4">
+                  <Image
+                    src={post?.user?.image ?? "/guest-image.jpg"}
+                    alt="profile image"
+                    width={100}
+                    height={100}
+                    className="h-16 w-16 rounded-full"
+                  />
+                  <span className="mt-auto w-16 text-sm text-slate-400 ">
+                    {post?.createdAt.toLocaleString()}
+                  </span>
+                </div>
                 <div className="flex flex-col">
                   <span className="font-bold">@{post.user?.username}</span>
                   <div className="max-h-36 overflow-y-hidden break-all">

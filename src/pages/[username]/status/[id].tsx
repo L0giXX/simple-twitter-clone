@@ -91,8 +91,41 @@ export default function Tweet(
           </div>
           <div className="flex flex-col">
             {comments?.map((comment) => (
-              <div key={comment.id} className="flex gap-4 p-4">
-                {comment.content}
+              <div
+                key={comment.id}
+                className="w-full items-center border-b p-4"
+              >
+                <div className="flex gap-4">
+                  <div>
+                    <Image
+                      className="mx-auto flex h-12 w-12 rounded-full"
+                      src={comment.user?.image ?? ""}
+                      alt="Profile Picture"
+                      width={50}
+                      height={50}
+                    />
+                  </div>
+                  <div className="flex flex-col">
+                    <div className="flex items-center">
+                      <span className="font-bold">
+                        @{comment.user?.username}&nbsp;·&nbsp;
+                      </span>
+                      <span className="text-slate-400">
+                        {Math.abs(
+                          (new Date().getTime() - comment.createdAt.getTime()) /
+                            1000 /
+                            60 /
+                            60
+                        ).toFixed(0)}
+                        &nbsp;h.
+                      </span>
+                    </div>
+
+                    <div className="max-h-36 overflow-y-hidden break-all">
+                      {comment.content}
+                    </div>
+                  </div>
+                </div>
               </div>
             ))}
           </div>
