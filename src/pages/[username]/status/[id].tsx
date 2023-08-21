@@ -29,7 +29,7 @@ export default function Tweet(
       </Head>
       <main className="mx-auto flex h-screen w-full border-x md:max-w-2xl">
         <div className="flex w-full flex-col">
-          <div className="flex gap-4 p-4">
+          <Link className="flex gap-4 p-4" href="/">
             <div className="flex flex-col gap-4">
               <Image
                 src={data?.user?.image ?? "/guest-image.jpg"}
@@ -50,7 +50,7 @@ export default function Tweet(
                 {data?.content}
               </div>
             </div>
-          </div>
+          </Link>
           <hr className="mx-4 border-gray-500" />
           <div className="flex border-b">
             <Authorized sessionData={sessionData} />
